@@ -97,12 +97,13 @@ type DashboardResponse = {
   error?: string;
 };
 
-function formatMoney(amountInCents: number) {
+function formatMoney(amount: number) {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
-    minimumFractionDigits: amountInCents % 100 === 0 ? 0 : 2,
-  }).format(amountInCents / 100);
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  }).format(amount);
 }
 
 function formatDate(value: string) {

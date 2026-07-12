@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { signIn, useSession } from 'next-auth/react';
 import React, { FormEvent, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 const categories = [
   'Moving & Lifting',
@@ -35,6 +36,7 @@ const initialForm: WorkerForm = {
 
 export default function WorkerPage() {
   const { data: session, status } = useSession();
+  const router = useRouter();
 
   const [form, setForm] = useState<WorkerForm>(initialForm);
   const [error, setError] = useState('');
@@ -115,7 +117,7 @@ export default function WorkerPage() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/workers', {
+      const response = await fetch('/api/worker', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -140,6 +142,12 @@ export default function WorkerPage() {
       }
 
       setSuccess('Your worker profile has been saved successfully.');
+
+setTimeout(() => {
+  router.push('/worker/dashboard');
+  router.refresh();
+}, 1000);
+
     } catch (submitError) {
       setError(
         submitError instanceof Error

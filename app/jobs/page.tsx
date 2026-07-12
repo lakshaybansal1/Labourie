@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { signIn, useSession } from 'next-auth/react';
 import React, { useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 const categories = [
   'All',
@@ -47,12 +48,12 @@ type JobsResponse = {
   error?: string;
 };
 
-function formatMoney(amountInCents: number) {
+function formatMoney(amount: number) {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
-    minimumFractionDigits: amountInCents % 100 === 0 ? 0 : 2,
-  }).format(amountInCents / 100);
+    minimumFractionDigits: 2,
+  }).format(amount);
 }
 
 function formatScheduledDate(dateValue: string) {
@@ -130,9 +131,11 @@ function getInitials(name: string) {
 function JobCard({
   job,
   signedIn,
+  router,
 }: {
   job: Job;
   signedIn: boolean;
+  router: ReturnType<typeof useRouter>;
 }) {
   return (
     <article className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:p-6">
@@ -262,7 +265,8 @@ function JobCard({
 
         alert("Application submitted successfully!");
 
-        window.location.href = "/worker";
+        router.push("/worker");
+        router.refresh();
       } catch (error) {
         console.error(error);
         alert("Something went wrong.");
@@ -288,6 +292,7 @@ function JobCard({
 }
 
 export default function JobsPage() {
+  const router = useRouter();
   const { data: session } = useSession();
 
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -569,6 +574,7 @@ export default function JobsPage() {
                   key={job.id}
                   job={job}
                   signedIn={Boolean(session?.user)}
+                  router={router}
                 />
               ))}
             </div>
