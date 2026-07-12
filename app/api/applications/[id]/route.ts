@@ -7,8 +7,8 @@ import {
   Prisma,
 } from '@prisma/client';
 
-import { authOptions } from '@/lib/auth-options';
-import { prisma } from '@/lib/prisma';
+import { authOptions } from "../../../../lib/auth-options";
+import { prisma } from "../../../../lib/prisma";
 
 type RouteParams = {
   id?: string;

@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { signIn, useSession } from 'next-auth/react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
+export const dynamic = 'force-dynamic';
+
 type ApplicationStatus =
   | 'PENDING'
   | 'ACCEPTED'

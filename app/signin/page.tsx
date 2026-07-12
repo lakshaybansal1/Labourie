@@ -1,11 +1,11 @@
 'use client';
 
 import Link from 'next/link';
+import { Suspense, FormEvent, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { signIn } from 'next-auth/react';
-import React, { FormEvent, useState } from 'react';
 
-export default function SignInPage() {
+function SignInForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -88,7 +88,7 @@ export default function SignInPage() {
                 type="email"
                 autoComplete="email"
                 value={email}
-                onChange={(event) => setEmail(event.target.value)}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none transition focus:border-black focus:ring-2 focus:ring-black/10"
               />
@@ -104,7 +104,7 @@ export default function SignInPage() {
                 type="password"
                 autoComplete="current-password"
                 value={password}
-                onChange={(event) => setPassword(event.target.value)}
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
                 className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none transition focus:border-black focus:ring-2 focus:ring-black/10"
               />
@@ -121,12 +121,29 @@ export default function SignInPage() {
 
           <p className="mt-6 text-center text-sm text-gray-600">
             Don&apos;t have an account?{' '}
-            <Link href="/signup" className="font-semibold text-black hover:underline">
+            <Link
+              href="/signup"
+              className="font-semibold text-black hover:underline"
+            >
               Create one
             </Link>
           </p>
         </div>
       </div>
     </main>
+  );
+}
+
+export default function SignInPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="flex min-h-screen items-center justify-center">
+          Loading...
+        </main>
+      }
+    >
+      <SignInForm />
+    </Suspense>
   );
 }
