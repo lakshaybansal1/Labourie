@@ -1,9 +1,10 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
-  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
   "/page": "app/page.js",
-  "/jobs/page": "app/jobs/page.js",
-  "/api/stripe/create-intent/route": "app/api/stripe/create-intent/route.js",
-  "/post/page": "app/post/page.js",
-  "/worker/page": "app/worker/page.js"
+  "/api/jobs/route": "app/api/jobs/route.js",
+  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
+  "/worker/dashboard/page": "app/worker/dashboard/page.js",
+  "/api/worker/dashboard/route": "app/api/worker/dashboard/route.js",
+  "/bookings/[id]/page": "app/bookings/[id]/page.js",
+  "/api/bookings/[id]/route": "app/api/bookings/[id]/route.js"
 }

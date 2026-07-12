@@ -1,21 +1,109 @@
-import CredentialsProvider from "next-auth/providers/credentials";
-import type { NextAuthOptions } from "next-auth";
+import bcrypt from 'bcryptjs';
+import type { NextAuthOptions } from 'next-auth';
+import CredentialsProvider from 'next-auth/providers/credentials';
+import { z } from 'zod';
+
+import { prisma } from '@/lib/prisma';
+
+const loginSchema = z.object({
+  email: z.string().trim().email(),
+  password: z.string().min(1),
+});
 
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
-      name: "Demo Credentials",
+      name: 'Email and Password',
+
       credentials: {
-        name: { label: "Name", type: "text" },
-        email: { label: "Email", type: "email" },
+        email: {
+          label: 'Email',
+          type: 'email',
+          placeholder: 'you@example.com',
+        },
+        password: {
+          label: 'Password',
+          type: 'password',
+        },
       },
+
       async authorize(credentials) {
-        if (credentials?.email && credentials?.name) {
-          return { id: credentials.email, name: credentials.name, email: credentials.email };
+        const parsed = loginSchema.safeParse(credentials);
+
+        if (!parsed.success) {
+          return null;
         }
-        return null;
+
+        const email = parsed.data.email.toLowerCase();
+
+        const user = await prisma.user.findUnique({
+          where: {
+            email,
+          },
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+            role: true,
+            passwordHash: true,
+          },
+        });
+
+        if (!user?.passwordHash) {
+          return null;
+        }
+
+        const passwordMatches = await bcrypt.compare(
+          parsed.data.password,
+          user.passwordHash,
+        );
+
+        if (!passwordMatches) {
+          return null;
+        }
+
+        return {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          image: user.image,
+          role: user.role,
+        };
       },
     }),
   ],
-  session: { strategy: "jwt" },
+
+  session: {
+    strategy: 'jwt',
+  },
+
+  pages: {
+    signIn: '/signin',
+  },
+
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.role = (user as { role?: string }).role;
+      }
+
+      return token;
+    },
+
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = String(token.id);
+        session.user.role = String(token.role) as
+          | 'HIRER'
+          | 'WORKER'
+          | 'ADMIN';
+      }
+
+      return session;
+    },
+  },
+
+  secret: process.env.NEXTAUTH_SECRET,
 };

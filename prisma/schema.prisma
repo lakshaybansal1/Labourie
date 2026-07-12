@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -16,89 +17,168 @@ model User {
   image        String?
   passwordHash String?
   createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  jobs         Job[]         @relation("HirerJobs")
-  applications Application[]
-  reviews      Review[]      @relation("UserReviews")
-  messages     Message[]     @relation("UserMessages")
-  Booking      Booking[]
+  workerProfile   WorkerProfile?
+  jobs            Job[]          @relation("HirerJobs")
+  applications    Application[]  @relation("WorkerApplications")
+  bookings        Booking[]      @relation("WorkerBookings")
+  reviewsWritten  Review[]       @relation("ReviewsWritten")
+  reviewsReceived Review[]       @relation("ReviewsReceived")
+  messages        Message[]      @relation("UserMessages")
+
+  @@index([role])
+  @@index([createdAt])
+}
+
+model WorkerProfile {
+  id String @id @default(cuid())
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  bio           String
+  skills        String[]
+  hourlyRate    Int
+  serviceRadius Int
+  city          String?
+  state         String?
+  isAvailable   Boolean  @default(true)
+  isVerified    Boolean  @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([hourlyRate])
+  @@index([isAvailable])
+  @@index([isVerified])
 }
 
 model Job {
   id      String @id @default(cuid())
   hirerId String
-  hirer   User   @relation("HirerJobs", fields: [hirerId], references: [id])
+  hirer   User   @relation("HirerJobs", fields: [hirerId], references: [id], onDelete: Cascade)
 
-  title       String
-  category    String
-  description String
-  budgetType  BudgetType
-  amount      Int
-  whenText    String
-  address     String
-  status      JobStatus  @default(OPEN)
-  createdAt   DateTime   @default(now())
+  title        String
+  category     String
+  description  String
+  budgetType   BudgetType
+  amount       Int
+  scheduledAt  DateTime
+  scheduleNote String?
+  address      String
+  city         String?
+  state        String?
+  postalCode   String?
+  latitude     Float?
+  longitude    Float?
+  status       JobStatus  @default(OPEN)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
 
   applications Application[]
   booking      Booking?
   messages     Message[]
+
+  @@index([hirerId])
+  @@index([status])
+  @@index([category])
+  @@index([scheduledAt])
+  @@index([createdAt])
 }
 
 model Application {
-  id    String @id @default(cuid())
+  id String @id @default(cuid())
+
   jobId String
-  job   Job    @relation(fields: [jobId], references: [id])
+  job   Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
 
   workerId String
-  worker   User   @relation(fields: [workerId], references: [id])
+  worker   User   @relation("WorkerApplications", fields: [workerId], references: [id], onDelete: Cascade)
 
-  note      String?
-  createdAt DateTime  @default(now())
-  status    AppStatus @default(PENDING)
+  note           String?
+  proposedAmount Int?
+  status         AppStatus @default(PENDING)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@unique([jobId, workerId])
+  @@index([jobId])
+  @@index([workerId])
+  @@index([status])
 }
 
 model Booking {
-  id    String @id @default(cuid())
+  id String @id @default(cuid())
+
   jobId String @unique
-  job   Job    @relation(fields: [jobId], references: [id])
+  job   Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
 
   workerId String
-  worker   User   @relation(fields: [workerId], references: [id])
+  worker   User   @relation("WorkerBookings", fields: [workerId], references: [id], onDelete: Restrict)
 
-  agreedRate      Int
-  createdAt       DateTime      @default(now())
-  status          BookingStatus @default(ACCEPTED)
-  paymentIntentId String?
+  agreedAmount     Int
+  status           BookingStatus @default(ACCEPTED)
+  paymentIntentId  String?       @unique
+  stripeTransferId String?       @unique
+  stripeChargeId   String?       @unique
+  acceptedAt       DateTime      @default(now())
+  startedAt        DateTime?
+  completedAt      DateTime?
+  paidAt           DateTime?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  reviews Review[]
+
+  @@index([workerId])
+  @@index([status])
 }
 
 model Review {
-  id        String  @id @default(cuid())
+  id String @id @default(cuid())
+
   bookingId String
-  rating    Int
-  comment   String?
+  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
 
   fromUserId String
-  fromUser   User   @relation("UserReviews", fields: [fromUserId], references: [id])
-  toUserId   String
+  fromUser   User   @relation("ReviewsWritten", fields: [fromUserId], references: [id], onDelete: Cascade)
 
+  toUserId String
+  toUser   User   @relation("ReviewsReceived", fields: [toUserId], references: [id], onDelete: Cascade)
+
+  rating    Int
+  comment   String?
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([bookingId, fromUserId])
+  @@index([toUserId])
+  @@index([fromUserId])
+  @@index([rating])
 }
 
 model Message {
-  id    String @id @default(cuid())
+  id String @id @default(cuid())
+
   jobId String
-  job   Job    @relation(fields: [jobId], references: [id])
+  job   Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
 
   fromUserId String
-  fromUser   User   @relation("UserMessages", fields: [fromUserId], references: [id])
+  fromUser   User   @relation("UserMessages", fields: [fromUserId], references: [id], onDelete: Cascade)
 
   body      String
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([jobId, createdAt])
+  @@index([fromUserId])
 }
 
 enum Role {
   HIRER
   WORKER
+  ADMIN
 }
 
 enum BudgetType {
@@ -107,11 +187,13 @@ enum BudgetType {
 }
 
 enum JobStatus {
+  DRAFT
   OPEN
   ACCEPTED
   IN_PROGRESS
   COMPLETED
   CANCELED
+  DISPUTED
 }
 
 enum AppStatus {
@@ -128,4 +210,5 @@ enum BookingStatus {
   DISPUTED
   REFUNDED
   PAID
+  CANCELED
 }
