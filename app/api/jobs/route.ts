@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { BudgetType, JobStatus, UserRole } from '@prisma/client';
+import { BudgetType, JobStatus } from '@prisma/client';
 
 import { authOptions } from '../../../lib/auth-options';
 import { prisma } from '../../../lib/prisma';
@@ -292,7 +292,7 @@ export async function POST(request: Request) {
       },
       update: {
         name,
-        role: UserRole.HIRER,
+        role: 'HIRER',
         ...(session.user.image
           ? { image: session.user.image }
           : {}),
@@ -300,7 +300,7 @@ export async function POST(request: Request) {
       create: {
         email,
         name,
-        role: UserRole.HIRER,
+        role: 'HIRER',
         image: session.user.image ?? null,
       },
     });
