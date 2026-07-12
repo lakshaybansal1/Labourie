@@ -224,9 +224,7 @@ export async function PATCH(
       );
     }
 
-    const nextStatus = requestedStatus as
-      | BookingStatus.IN_PROGRESS
-      | BookingStatus.COMPLETED;
+    const nextStatus = requestedStatus as BookingStatus;
 
     const booking = await prisma.booking.findUnique({
       where: {
