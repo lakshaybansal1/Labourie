@@ -59,12 +59,13 @@ type BookingResponse = {
   error?: string;
 };
 
-function formatMoney(amountInCents: number) {
+function formatMoney(amount: number) {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
-    minimumFractionDigits: amountInCents % 100 === 0 ? 0 : 2,
-  }).format(amountInCents / 100);
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(amount);
 }
 
 function formatDate(value: string | null) {
@@ -315,7 +316,7 @@ export default function BookingDetailsPage() {
 
   const canComplete =
     (isWorker || isHirer) &&
-    booking.status === 'IN_PROGRESS';
+    booking.status === 'IN_PROGRESS'; 
 
   return (
     <main className="min-h-screen bg-gray-50">

@@ -1,18 +1,18 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import React, { useEffect, useMemo, useState } from 'react';
-import { signIn, signOut, useSession } from 'next-auth/react';
+import Link from "next/link";
+import React, { useEffect, useMemo, useState } from "react";
+import { signIn, signOut, useSession } from "next-auth/react";
 
 type IconName =
-  | 'search'
-  | 'message'
-  | 'payment'
-  | 'star'
-  | 'verified'
-  | 'support'
-  | 'arrow'
-  | 'check';
+  | "search"
+  | "message"
+  | "payment"
+  | "star"
+  | "verified"
+  | "support"
+  | "arrow"
+  | "check";
 
 type Feature = {
   title: string;
@@ -20,7 +20,7 @@ type Feature = {
   icon: IconName;
 };
 
-type BudgetType = 'FIXED' | 'HOURLY';
+type BudgetType = "FIXED" | "HOURLY";
 
 type Job = {
   id: string;
@@ -53,57 +53,57 @@ type JobsResponse = {
 };
 
 const categories = [
-  'Moving & Lifting',
-  'Cleaning',
-  'Yard & Snow',
-  'Handyman',
-  'Event Setup',
-  'Deliveries',
+  "Moving & Lifting",
+  "Cleaning",
+  "Yard & Snow",
+  "Handyman",
+  "Event Setup",
+  "Deliveries",
 ];
 
 const features: Feature[] = [
   {
-    title: 'Quick Job Posting',
+    title: "Quick Job Posting",
     description:
-      'Create a job in minutes with your budget, schedule, location, and task requirements.',
-    icon: 'search',
+      "Create a job in minutes with your budget, schedule, location, and task requirements.",
+    icon: "search",
   },
   {
-    title: 'In-app Messaging',
+    title: "In-app Messaging",
     description:
-      'Discuss job details, schedules, and expectations directly with applicants.',
-    icon: 'message',
+      "Discuss job details, schedules, and expectations directly with applicants.",
+    icon: "message",
   },
   {
-    title: 'Secure Payments',
+    title: "Secure Payments",
     description:
-      'Payments can be securely managed after a worker is selected for the job.',
-    icon: 'payment',
+      "Payments can be securely managed after a worker is selected for the job.",
+    icon: "payment",
   },
   {
-    title: 'Ratings & Reviews',
+    title: "Ratings & Reviews",
     description:
-      'Build trust through feedback from completed jobs and previous customers.',
-    icon: 'star',
+      "Build trust through feedback from completed jobs and previous customers.",
+    icon: "star",
   },
   {
-    title: 'Worker Profiles',
+    title: "Worker Profiles",
     description:
-      'Workers can display their skills, rates, service areas, and experience.',
-    icon: 'verified',
+      "Workers can display their skills, rates, service areas, and experience.",
+    icon: "verified",
   },
   {
-    title: 'Safety & Support',
+    title: "Safety & Support",
     description:
-      'Get assistance with job issues, payment concerns, or account questions.',
-    icon: 'support',
+      "Get assistance with job issues, payment concerns, or account questions.",
+    icon: "support",
   },
 ];
 
 function formatMoney(amountInCents: number) {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
     minimumFractionDigits: amountInCents % 100 === 0 ? 0 : 2,
   }).format(amountInCents / 100);
 }
@@ -112,44 +112,44 @@ function formatSchedule(dateValue: string) {
   const date = new Date(dateValue);
 
   if (Number.isNaN(date.getTime())) {
-    return 'Schedule unavailable';
+    return "Schedule unavailable";
   }
 
-  return new Intl.DateTimeFormat('en-US', {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
+  return new Intl.DateTimeFormat("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
   }).format(date);
 }
 
 function getLocation(job: Job) {
-  const location = [job.city, job.state].filter(Boolean).join(', ');
+  const location = [job.city, job.state].filter(Boolean).join(", ");
 
-  return location || job.address || 'Location available after acceptance';
+  return location || job.address || "Location available after acceptance";
 }
 
 function Icon({
   name,
-  className = 'h-5 w-5',
+  className = "h-5 w-5",
 }: {
   name: IconName;
   className?: string;
 }) {
   const commonProps = {
     className,
-    viewBox: '0 0 24 24',
-    fill: 'none',
-    stroke: 'currentColor',
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
     strokeWidth: 1.8,
-    strokeLinecap: 'round' as const,
-    strokeLinejoin: 'round' as const,
-    'aria-hidden': true,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+    "aria-hidden": true,
   };
 
   switch (name) {
-    case 'search':
+    case "search":
       return (
         <svg {...commonProps}>
           <circle cx="11" cy="11" r="7" />
@@ -157,14 +157,14 @@ function Icon({
         </svg>
       );
 
-    case 'message':
+    case "message":
       return (
         <svg {...commonProps}>
           <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z" />
         </svg>
       );
 
-    case 'payment':
+    case "payment":
       return (
         <svg {...commonProps}>
           <rect x="3" y="5" width="18" height="14" rx="2" />
@@ -173,14 +173,14 @@ function Icon({
         </svg>
       );
 
-    case 'star':
+    case "star":
       return (
         <svg {...commonProps}>
           <path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z" />
         </svg>
       );
 
-    case 'verified':
+    case "verified":
       return (
         <svg {...commonProps}>
           <path d="M12 3 5 6v5c0 4.7 2.9 8.1 7 10 4.1-1.9 7-5.3 7-10V6z" />
@@ -188,7 +188,7 @@ function Icon({
         </svg>
       );
 
-    case 'support':
+    case "support":
       return (
         <svg {...commonProps}>
           <circle cx="12" cy="12" r="9" />
@@ -197,7 +197,7 @@ function Icon({
         </svg>
       );
 
-    case 'arrow':
+    case "arrow":
       return (
         <svg {...commonProps}>
           <path d="M5 12h14" />
@@ -205,7 +205,7 @@ function Icon({
         </svg>
       );
 
-    case 'check':
+    case "check":
       return (
         <svg {...commonProps}>
           <path d="m5 12 4 4L19 6" />
@@ -253,25 +253,30 @@ export default function Page() {
 
   const [jobs, setJobs] = useState<Job[]>([]);
   const [jobsLoading, setJobsLoading] = useState(true);
-  const [jobsError, setJobsError] = useState('');
+  const [jobsError, setJobsError] = useState("");
 
   const userName =
-    session?.user?.name?.split(' ')[0] || session?.user?.email || 'there';
+    session?.user?.name?.split(" ")[0] || session?.user?.email || "there";
+  const isWorker = session?.user?.role === "WORKER";
+  const isHirer = session?.user?.role === "HIRER";
+
+  const dashboardHref = isWorker ? "/worker/dashboard" : "/hirer";
+  const dashboardLabel = isWorker ? "Worker Dashboard" : "Hirer Dashboard";
 
   const loadJobs = async () => {
     setJobsLoading(true);
-    setJobsError('');
+    setJobsError("");
 
     try {
-      const response = await fetch('/api/jobs', {
-        method: 'GET',
-        cache: 'no-store',
+      const response = await fetch("/api/jobs", {
+        method: "GET",
+        cache: "no-store",
       });
 
       const result = (await response.json()) as JobsResponse;
 
       if (!response.ok) {
-        throw new Error(result.error || 'Unable to load jobs.');
+        throw new Error(result.error || "Unable to load jobs.");
       }
 
       setJobs(Array.isArray(result.jobs) ? result.jobs : []);
@@ -279,7 +284,7 @@ export default function Page() {
       setJobsError(
         error instanceof Error
           ? error.message
-          : 'Something went wrong while loading jobs.',
+          : "Something went wrong while loading jobs.",
       );
     } finally {
       setJobsLoading(false);
@@ -323,16 +328,13 @@ export default function Page() {
               Features
             </a>
 
-            <Link
-              href="/jobs"
-              className="transition-colors hover:text-black"
-            >
+            <Link href="/jobs" className="transition-colors hover:text-black">
               Browse jobs
             </Link>
           </nav>
 
           <div className="ml-auto flex items-center gap-2 lg:ml-4">
-            {status !== 'loading' &&
+            {status !== "loading" &&
               (session ? (
                 <div className="hidden items-center gap-2 sm:flex">
                   <span className="max-w-32 truncate text-sm text-gray-600">
@@ -357,25 +359,20 @@ export default function Page() {
                 </button>
               ))}
 
-            <Link
-              className="btn-ghost hidden md:inline-flex"
-              href="/worker/dashboard"
-            >
-              Worker Dashboard
-            </Link>
-
-            <Link
-              className="btn-ghost hidden md:inline-flex"
-              href="/hirer"
-            >
-              Hirer Dashboard
-            </Link>
+            {session && (
+              <Link
+                className="btn-ghost hidden md:inline-flex"
+                href={dashboardHref}
+              >
+                {dashboardLabel}
+              </Link>
+            )}
 
             <Link
               className="btn-primary whitespace-nowrap"
-              href="/post"
+              href={isWorker ? "/jobs" : "/post"}
             >
-              Post a job
+              {isWorker ? "Find jobs" : "Post a job"}
             </Link>
           </div>
         </div>
@@ -400,30 +397,53 @@ export default function Page() {
             </div>
 
             <h1 className="max-w-3xl text-4xl font-extrabold leading-[1.08] tracking-tight sm:text-5xl md:text-6xl">
-              Hire reliable local labor in minutes
+              {isWorker
+                ? "Find flexible local work near you"
+                : "Hire reliable local labor in minutes"}
             </h1>
 
             <p className="mt-6 max-w-2xl text-lg leading-8 text-gray-600">
-              Find trusted help for moving, cleaning, yard work, event setup,
-              deliveries, and more. Post your task and connect with available
-              workers nearby.
+              {isWorker
+                ? "Browse local jobs, apply instantly, and earn money on your own schedule."
+                : "Find trusted help for moving, cleaning, yard work, event setup, deliveries, and more. Post your task and connect with available workers nearby."}
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link
-                className="btn-primary inline-flex items-center justify-center gap-2 px-5 py-3"
-                href="/post"
-              >
-                Post a job
-                <Icon name="arrow" className="h-4 w-4" />
-              </Link>
+              {isWorker ? (
+                <>
+                  <Link
+                    className="btn-primary inline-flex items-center justify-center gap-2 px-5 py-3"
+                    href="/jobs"
+                  >
+                    Find jobs
+                    <Icon name="arrow" className="h-4 w-4" />
+                  </Link>
 
-              <Link
-                className="btn-ghost inline-flex items-center justify-center px-5 py-3"
-                href="/jobs"
-              >
-                Browse available jobs
-              </Link>
+                  <Link
+                    className="btn-ghost inline-flex items-center justify-center px-5 py-3"
+                    href="/worker/dashboard"
+                  >
+                    My dashboard
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link
+                    className="btn-primary inline-flex items-center justify-center gap-2 px-5 py-3"
+                    href="/post"
+                  >
+                    Post a job
+                    <Icon name="arrow" className="h-4 w-4" />
+                  </Link>
+
+                  <Link
+                    className="btn-ghost inline-flex items-center justify-center px-5 py-3"
+                    href={isHirer ? "/hirer" : "/jobs"}
+                  >
+                    {isHirer ? "My dashboard" : "Browse available jobs"}
+                  </Link>
+                </>
+              )}
             </div>
 
             <div className="mt-8 flex flex-wrap gap-2">
@@ -434,9 +454,9 @@ export default function Page() {
 
             <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-gray-600">
               {[
-                'No long-term commitment',
-                'Worker profiles',
-                'Secure job management',
+                "No long-term commitment",
+                "Worker profiles",
+                "Secure job management",
               ].map((item) => (
                 <div key={item} className="flex items-center gap-2">
                   <span className="flex h-5 w-5 items-center justify-center rounded-full bg-gray-950 text-white">
@@ -533,10 +553,7 @@ export default function Page() {
               {!jobsLoading && !jobsError && recentJobs.length > 0 && (
                 <div className="divide-y divide-gray-100">
                   {recentJobs.map((job) => (
-                    <div
-                      key={job.id}
-                      className="py-5 first:pt-5 last:pb-2"
-                    >
+                    <div key={job.id} className="py-5 first:pt-5 last:pb-2">
                       <div className="flex items-start justify-between gap-4">
                         <div className="min-w-0">
                           <p className="truncate font-semibold text-gray-950">
@@ -550,7 +567,7 @@ export default function Page() {
 
                         <span className="whitespace-nowrap rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-800">
                           {formatMoney(job.amount)}
-                          {job.budgetType === 'HOURLY' ? '/hr' : ''}
+                          {job.budgetType === "HOURLY" ? "/hr" : ""}
                         </span>
                       </div>
 
@@ -576,34 +593,30 @@ export default function Page() {
             <div className="relative mt-5 grid grid-cols-3 gap-3">
               <div className="rounded-2xl border border-gray-200 bg-white p-4 text-center shadow-sm">
                 <div className="text-xl font-bold">
-                  {jobsLoading ? '—' : jobs.length}
+                  {jobsLoading ? "—" : jobs.length}
                 </div>
 
                 <div className="mt-1 text-xs text-gray-500">
-                  Open {jobs.length === 1 ? 'job' : 'jobs'}
+                  Open {jobs.length === 1 ? "job" : "jobs"}
                 </div>
               </div>
 
               <div className="rounded-2xl border border-gray-200 bg-white p-4 text-center shadow-sm">
                 <div className="text-xl font-bold">
                   {jobsLoading
-                    ? '—'
+                    ? "—"
                     : averageJobValue > 0
                       ? formatMoney(averageJobValue)
-                      : '$0'}
+                      : "$0"}
                 </div>
 
-                <div className="mt-1 text-xs text-gray-500">
-                  Average job
-                </div>
+                <div className="mt-1 text-xs text-gray-500">Average job</div>
               </div>
 
               <div className="rounded-2xl border border-gray-200 bg-white p-4 text-center shadow-sm">
                 <div className="text-xl font-bold">{categories.length}</div>
 
-                <div className="mt-1 text-xs text-gray-500">
-                  Job categories
-                </div>
+                <div className="mt-1 text-xs text-gray-500">Job categories</div>
               </div>
             </div>
           </div>
@@ -633,7 +646,9 @@ export default function Page() {
                 For hirers
               </span>
 
-              <h3 className="mt-4 text-2xl font-bold">Get reliable help fast</h3>
+              <h3 className="mt-4 text-2xl font-bold">
+                Get reliable help fast
+              </h3>
             </div>
 
             <div className="space-y-7">
@@ -787,16 +802,16 @@ export default function Page() {
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link
                 className="inline-flex items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-gray-100"
-                href="/post"
+                href={isWorker ? "/jobs" : "/post"}
               >
-                Post a job
+                {isWorker ? "Find jobs" : "Post a job"}
               </Link>
 
               <Link
                 className="inline-flex items-center justify-center rounded-xl border border-white/25 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
-                href="/jobs"
+                href={session ? dashboardHref : "/jobs"}
               >
-                Browse jobs
+                {session ? "My dashboard" : "Browse jobs"}
               </Link>
             </div>
           </div>
@@ -812,7 +827,6 @@ export default function Page() {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-black text-xs font-bold text-white">
               LL
             </div>
-
             LaborLink
           </Link>
 
@@ -821,17 +835,17 @@ export default function Page() {
               Browse jobs
             </Link>
 
-            <Link href="/worker/dashboard" className="hover:text-black">
-              Worker Dashboard
-            </Link>
+            {session && (
+              <Link href={dashboardHref} className="hover:text-black">
+                {dashboardLabel}
+              </Link>
+            )}
 
-            <Link href="/hirer" className="hover:text-black">
-              Hirer Dashboard
-            </Link>
-
-            <Link href="/post" className="hover:text-black">
-              Post a job
-            </Link>
+            {!isWorker && (
+              <Link href="/post" className="hover:text-black">
+                Post a job
+              </Link>
+            )}
           </div>
 
           <p className="sm:border-l sm:border-gray-200 sm:pl-5">

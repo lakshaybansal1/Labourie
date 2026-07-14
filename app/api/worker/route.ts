@@ -200,19 +200,19 @@ export async function POST(request: Request) {
     }
 
     if (
-      !Number.isInteger(hourlyRate) ||
-      hourlyRate < 1000 ||
-      hourlyRate > 50000
-    ) {
-      return NextResponse.json(
-        {
-          error: 'Hourly rate must be between $10 and $500.',
-        },
-        {
-          status: 400,
-        },
-      );
-    }
+  !Number.isFinite(hourlyRate) ||
+  hourlyRate < 10 ||
+  hourlyRate > 500
+) {
+  return NextResponse.json(
+    {
+      error: 'Hourly rate must be between $10 and $500.',
+    },
+    {
+      status: 400,
+    },
+  );
+}
 
     if (
       !Number.isInteger(serviceRadius) ||
